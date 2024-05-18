@@ -1,0 +1,237 @@
+    <!-- Incluir jQuery y Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+<?php
+
+?>
+<div class="content-wrapper">
+
+  <section class="content-header">
+    <h1>
+      Administrar Simposios
+    </h1>
+    <ol class="breadcrumb">     
+      <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>     
+      <li class="active">Administrar Simposio</li>  
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="box">
+      <div class="box-header with-border">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarestudiante">        
+          Agregar Simposio
+        </button>
+      </div>
+      <div class="box-body">  
+
+       <table class="table table-bordered table-striped dt-responsive tablas" width="100%">
+        <thead>         
+         <tr>           
+           <th style="width:10px">#</th>
+           <th>Simposio a asistir</th>
+           <th>Estudiante</th>
+           <th>Pago del Evento</th>
+           <th>Fecha/Hora Registrado</th>
+           <th>Validar Pago</th>
+           <th>Acciones</th>
+         </tr> 
+        </thead>
+        <tbody>
+
+        <?php
+
+        $item = null;
+        $valor = null;
+
+        $usuarios = Controladorsimposios::ctrMostrarsimposios($item, $valor);
+
+       foreach ($usuarios as $key => $value){
+         
+          echo ' <tr>
+                  <td>'.($key+1).'</td>
+                  <td>'.$value["id_estudiante"].'</td>
+                  <td>'.$value["id_evento"].'</td>';
+
+                  if($value["comprobante"] != ""){
+
+                    echo '<td><img src="'.$value["comprobante"].'" class="img-thumbnail" width="40px"></td>';
+
+                  }else{
+
+                    echo '<td><img src="vistas/img/usuarios/default/anonymous.png" class="img-thumbnail" width="40px"></td>';
+
+                  }
+
+   '
+
+                  </td>
+
+                </tr>';
+        }
+
+
+        ?> 
+
+        </tbody>
+       </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!--=====================================
+MODAL AGREGAR estudiante
+======================================-->
+<div id="modalAgregarestudiante" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form role="form" method="post">
+
+        <!--=====================================
+        CABEZA DEL MODAL
+        ======================================-->
+        <div class="modal-header" style="background:#3c8dbc; color:white">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Agregar Asistencia de Simposio</h4>
+        </div>
+
+        <!--=====================================
+        CUERPO DEL MODAL
+        ======================================-->
+        <div class="modal-body">
+          <div class="box-body">
+
+         <!-- SELECCIONAR EL EVENTO -->
+          <div class="form-group">
+            Seleccione al Evento que asistirá:
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+              <select class="form-control input-lg select2" id="Evento" name="Evento" required>
+                <?php
+                  require_once "conexion.php";
+                  $stmt = Conexionsi::conectar()->prepare("SELECT id_evento, nombre_evento FROM eventos");
+                  if ($stmt->execute()) {
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                      $id_evento = htmlspecialchars($row['id_evento']);
+                      $nombre_evento = htmlspecialchars($row['nombre_evento']);
+                      echo "<option value='$id_evento'>$nombre_evento</option>";
+                    }
+                  } else {
+                    $error = $stmt->errorInfo();
+                    echo "Error: " . htmlspecialchars($error[2]);
+                    exit();
+                  }
+                ?>
+              </select>
+            </div>
+          </div>
+
+
+            <style>
+              .select2-container--default .select2-selection--single {
+                height: 45px; /* Altura del campo */
+                padding: 10px; /* Espaciado interno */
+              }
+
+              .select2 {
+                width: 100% !important; /* Ocupa el 100% del contenedor padre */
+              }
+
+              .select2-dropdown {
+                width: auto !important; /* Ajusta el ancho del desplegable automáticamente */
+              }
+            </style>
+
+            <script>
+              $(document).ready(function() {
+                $('.select2').select2({
+                  dropdownAutoWidth: true,
+                  width: '100%' // Ajusta el ancho del select2
+                });
+              });
+            </script>
+                      
+
+        <!-- SELECCIONAR EL ESTUDIANTE -->
+          <div class="form-group">
+            Seleccione su nombre completo: 
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+              <select class="form-control input-lg select2" id="Estudiante" name="Estudiante" required>
+                <?php
+                  require_once "conexion.php";
+                  $stmt = Conexionsi::conectar()->prepare("SELECT id, nombre, carnet FROM estudiantes");
+                  $stmt->execute();  
+
+                  if (!$stmt->execute()) {
+                    $error = $stmt->errorInfo();
+                    echo "Error: " . $error[2];  
+                    exit();
+                  }
+
+                  while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $id_estudiante = $row['id'];
+                    $nombre_estudiante = $row['nombre'];
+                    $carnet = $row['carnet'];
+                    echo "<option value='$id_estudiante'>$nombre_estudiante-$carnet</option>";
+                  }
+                ?>
+              </select>
+            </div>
+          </div>
+
+            <style>
+              .select2-container--default .select2-selection--single {
+                height: 45px; /* Altura del campo */
+                padding: 10px; /* Espaciado interno */
+              }
+
+              .select2 {
+                width: 100% !important; /* Ocupa el 100% del contenedor padre */
+              }
+
+              .select2-dropdown {
+                width: auto !important; /* Ajusta el ancho del desplegable automáticamente */
+              }
+            </style>
+
+            <script>
+              $(document).ready(function() {
+                $('.select2').select2({
+                  dropdownAutoWidth: true,
+                  width: '100%' // Ajusta el ancho del select2
+                });
+              });
+            </script>
+
+            <!-- SUBIR EL COMPROBANTE DE PAGO -->
+            <div class="form-group">
+              <div class="panel">SUBIR COMPROBANTE DE PAGO</div>
+              <input type="file" class="nuevaFoto" name="nuevaFoto">
+              <p class="help-block">Peso máximo de la foto 2MB</p>
+              <img src="vistas/img/usuarios/default/anonymous.png" class="img-thumbnail previsualizar" width="100px">
+            </div>
+     
+
+          </div>
+        </div>
+
+        <!--=====================================
+        PIE DEL MODAL
+        ======================================-->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
+          <button type="submit" class="btn btn-primary">Guardar estudiante</button>
+        </div>
+      </form>
+      <?php
+        $crearestudiante = new Controladorsimposios();
+        $crearestudiante -> ctrCrearsimposio();
+      ?>
+    </div>
+  </div>
+</div>
+
+
