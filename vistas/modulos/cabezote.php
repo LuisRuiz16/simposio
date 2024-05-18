@@ -51,9 +51,9 @@
 						$archivoExiste = file_exists($rutaCompletaArchivo);
 
 						if ($archivoExiste) {
-							echo '<td><img src="' . $rutaCompletaArchivo . '" class="img-thumbnail imagen-comprobante" width="40px"></td>';
+							echo '<td><img src="' . $rutaCompletaArchivo . '" class="img-thumbnail imagen-comprobante" width="20px"></td>';
 						} else {
-							echo '<td><img src="vistas/img/usuarios/default/anonymous.png" class="img-thumbnail imagen-comprobante" width="40px"></td>';
+							echo '<td><img src="vistas/img/usuarios/default/anonymous.png" class="img-thumbnail imagen-comprobante" width="20px"></td>';
 						}
 
 					?>
